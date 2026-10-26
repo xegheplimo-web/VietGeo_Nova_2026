@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(**)",
+      "Exec(git)",
+      "Exec(py)",
+      "Exec(python)",
+      "Exec(uv)",
+      "Exec(ruff)",
+      "Exec(mypy)",
+      "Exec(docker)",
+      "Exec(pre-commit)"
+    ],
+    "deny": [
+      "Exec(sudo)"
+    ]
+  }
+}

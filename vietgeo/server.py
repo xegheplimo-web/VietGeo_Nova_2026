@@ -422,14 +422,16 @@ def main():
                     cwd=str(storage.ROOT),
                     capture_output=True,
                     text=True,
+                    encoding="utf-8",
+                    errors="replace",
                     timeout=90,
                 )
                 if result.returncode == 0:
-                    print("Hành chính:", result.stdout.strip(), flush=True)
+                    print("Hành chính:", (result.stdout or "").strip(), flush=True)
                 else:
                     print(
                         "Không đồng bộ được xã/phường (có thể chạy tools/sync_admin.py):",
-                        result.stderr.strip()[:300],
+                        (result.stderr or "").strip()[:300],
                         flush=True,
                     )
             except Exception as exc:

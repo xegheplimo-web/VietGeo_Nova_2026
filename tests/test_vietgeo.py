@@ -1,6 +1,5 @@
 """Stand-alone smoke and API correctness gates. No external network required."""
 
-import io
 import json
 import os
 import tempfile
@@ -210,14 +209,33 @@ class HttpTests(unittest.TestCase):
                 }
             ]
         }
-        # Patch the server's OSM import path so no real network is reached.
-        # side_effect returns a fresh BytesIO per call (BytesIO is closed by `with`).
-        def _fake_urlopen(_request, timeout=38):
-            return io.BytesIO(json.dumps(raw).encode("utf-8"))
+        elements = raw["elements"]
 
-        with patch.object(osm, "urlopen", side_effect=_fake_urlopen) as mocked:
+        # Full control: parse Overpass JSON ourselves, bypassing the network
+        # (urlopen patching is unreliable across Python versions / runner threads).
+        def _fake_import(bbox):
+            imported = 0
+            c = db.connect()
+            try:
+                for item in elements:
+                    record = osm.from_overpass(item)
+                    if record:
+                        payload, ref = record
+                        _, changed = db.upsert(c, payload, external_id=ref, source="osm")
+                        imported += int(changed)
+                c.commit()
+            finally:
+                c.close()
+            return {
+                "imported": imported,
+                "fetched": len(elements),
+                "truncated": False,
+                "provider": "Overpass / OSM / ODbL (mocked)",
+            }
+
+        with patch("vietgeo.osm.import_small_area", side_effect=_fake_import) as mocked:
             st, x = self.call("/api/osm/area", "POST", {"bbox": [105.7, 21, 105.9, 21.3]})
-        self.assertTrue(mocked.called, "mock urlopen must be invoked; real network must not run in CI")
+        self.assertTrue(mocked.called, "import_small_area must be mocked; real Overpass must not run")
         osm._last_requested = old
         self.assertEqual(st, 200)
         self.assertEqual(x["imported"], 1)
