@@ -8,7 +8,7 @@ import argparse
 import hashlib
 import json
 import tempfile
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from urllib.request import Request, urlopen
 
@@ -74,7 +74,7 @@ def main():
         "source": URL,
         "license": "CC-BY-4.0",
         "source_last_reported_update": "2026-09-08",
-        "downloaded_utc": datetime.now(UTC).isoformat(),
+        "downloaded_utc": datetime.now(timezone.utc).isoformat(),
         "sha256_raw": hashlib.sha256(content).hexdigest(),
         "sha256_compact": hashlib.sha256(compact).hexdigest(),
         "count": len(rows),

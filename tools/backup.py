@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 from contextlib import closing
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -14,7 +14,7 @@ from vietgeo import db
 def main():
     folder = db.ROOT / "backups"
     folder.mkdir(exist_ok=True)
-    out = folder / ("vietgeo-" + datetime.now(UTC).strftime("%Y%m%d-%H%M%S") + ".sqlite3")
+    out = folder / ("vietgeo-" + datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S") + ".sqlite3")
     with closing(db.connect()) as c:
         db.backup(c, out)
     import sqlite3

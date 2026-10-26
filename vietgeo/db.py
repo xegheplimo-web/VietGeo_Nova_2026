@@ -10,7 +10,7 @@ import os
 import re
 import sqlite3
 import unicodedata
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -66,7 +66,7 @@ def ascii_fold(s: str) -> str:
 
 
 def now() -> str:
-    return datetime.now(UTC).isoformat(timespec="seconds")
+    return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
 def connect(db_path: str | Path | None = None) -> sqlite3.Connection:

@@ -6,7 +6,7 @@ import argparse
 import hashlib
 import json
 import tempfile
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from urllib.request import Request, urlopen
 
@@ -65,7 +65,7 @@ def main():
     meta = {
         "source": SOURCE,
         "license": "ODbL-1.0",
-        "retrieved_utc": datetime.now(UTC).isoformat(),
+        "retrieved_utc": datetime.now(timezone.utc).isoformat(),
         "size_bytes": count,
         "sha256": h.hexdigest(),
         "last_modified": source.headers.get("Last-Modified"),
