@@ -38,4 +38,20 @@ Quyết định: **không đổi thuật toán** (YAGNI cho app localhost, DB đ
 
 ## D-007 — mypy vào CI là P0
 
-9 lỗi mypy (`db.py` ×7, `osm.py` ×1) không enforce. Rẻ, làm trong P0.
+`9 lỗi mypy (`db.py` ×7, `osm.py` ×1) không enforce. Rẻ, làm trong P0.
+
+## D-008 (2026-10-27) — GPT: offline-first vector architecture (Q1→Q3)
+
+GPT planning channel (2026-10-27, thread `6adfafb3`) đồng thuận: **không thay MapLibre** (hiện chạy vector qua OpenFreeMap); chuyển raster-online→**vector local bằng PMTiles** + Planetiler data pipeline (offline, chạy **ngoài** Python runtime → zero-deps runtime vẫn giữ). Roadmap 3 cột:
+
+| Quarter | Tên | Chính | Exit gate |
+|---|---|---|---|
+| Q1 | Offline Foundation | Self-host MapLibre/worker/glyph; Planetiler→PMTiles; HTTP Range handler 206/416/HEAD/allowlist; import POI thật; D-005 bbox benchmark; security gates | Mất internet vẫn render/zoom/search/mở POI |
+| Q2 | Search + Routing | Vietnamese autocomplete; Valhalla Docker sidecar (optional); route polyline+ETA | Tìm địa chỉ+đường offline, 0 external request |
+| Q3 | Terrain + 3D | DEM regional pack; hillshade; 3D OSM buildings | 3D trên GPU hỗ trợ, graceful fallback 2D |
+
+Trade-off đã chấp nhận: data pipeline (Java Planetiler, C++/Docker Valhalla, DEM tools) là **build-time side**, không ảnh hưởng zero-deps runtime; traffic realtime/loiter không trong roadmap (offline-first). Evidence đầy đủ persist tại `docs/orchestration/reference/gpt_map_reply.md`.
+
+## D-009 — VGN-OSM-001 dispatch order
+
+Q1 Offline Vector Foundation **dispatch sau khi P0-A/P0-B merge** + **Sếp phê duyệt Java toolchain** (Planetiler JVM, ~200 MB) — đây là decision sản phẩm/cost, không tự quyết định.

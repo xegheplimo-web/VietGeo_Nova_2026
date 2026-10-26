@@ -38,3 +38,20 @@ P1-B độc lập, chạy sau P0
 - Wave 1: P0-A + P0-B song song (2 worktree, write scope không chồng), mỗi lane ≤ 1500s.
 - Wave 2: P1-A, P1-B.
 - Điều kiện dừng: ≥2 fail cùng nguyên nhân gốc → dừng dispatch, vào maintenance lane.
+
+## Q1–Q3 roadmap (D-008 — xem DECISIONS.md D-008 chi tiết)
+
+Offline-first vector architecture (GPT 2026-10-27, không thay MapLibre). Runtime Python stdlib zero-deps vẫn được bảo toàn; pipeline build (Planetiler/Valhalla/Dem) là side.
+
+| Quarter | Tên | Mục tiêu | Exit gate | Chặn P0? |
+|---|---|---|---|---|
+| Q1 | Offline Foundation | Self-host MapLibre/worker; Planetiler→PMTiles; HTTP Range handler; import POI thật; D-005 benchmark | Mất internet vẫn render/zoom/search/POI | Không |
+| Q2 | Search + Routing | Vietnamese autocomplete; Valhalla sidecar; route polyline+ETA | Tìm đường offline, 0 external request | Không |
+| Q3 | Terrain + 3D | DEM regional; hillshade; 3D OSM buildings | Graceful fallback 2D | Không |
+
+## VGN-OSM-001 — Offline Vector Foundation (Q1, chặn sau P0)
+
+**Scope:** implement HTTP Range handler trong Python stdlib (206/416/HEAD/byte-range/allowlist), serve 1 sample PMTiles archive (tải từ Protomaps samples — không cần Planetiler ngay), MapLibre render local.
+**Write scope:** `vietgeo/server.py` (+ `docs/` mô tả offline pack).
+**Pre-req sản phẩm:** **Sếp phê duyệt Java toolchain** (Planetiler JVM, ~200 MB) cho bước build PMTiles Việt Nam thật — dispatch task này sau khi P0-A/P0-B merge + Sếp OK toolchain.
+**Acceptance:** `curl -H "Range: bytes=0-262" <archive>` → `206 Partial Content` + `Content-Range`; HEAD → 200 + `Accept-Ranges: bytes`; offline mode (block internet) → 0 external request; regression POI/CRUD/FTS test PASS.
