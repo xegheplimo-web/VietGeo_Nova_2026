@@ -70,7 +70,7 @@ def now() -> str:
 
 
 def connect(db_path: str | Path | None = None) -> sqlite3.Connection:
-    path = Path(db_path or os.getenv("VIETGEO_DB", str(DEFAULT_DB))).resolve()
+    path = Path(str(db_path or os.getenv("VIETGEO_DB", str(DEFAULT_DB)))).resolve()
     path.parent.mkdir(parents=True, exist_ok=True)
     db = sqlite3.connect(path, timeout=30)
     db.row_factory = sqlite3.Row
@@ -110,16 +110,17 @@ def normalize(data: dict, *, force_source: str | None = None) -> dict:
             raise ValueError("tags không phải JSON") from exc
     if not isinstance(tags, dict) or len(json.dumps(tags, ensure_ascii=False)) > 12000:
         raise ValueError("tags phải là đối tượng JSON tối đa 12 KB")
-    row.update(
-        name=name,
-        lat=lat,
-        lon=lon,
-        verified=int(bool(data.get("verified", False))),
-        tags=json.dumps(tags, ensure_ascii=False),
-        updated_at=now(),
-        search_norm=ascii_fold(" ".join((name, row["address"], row["province"], row["category"]))),
-    )
-    return row
+    record: dict[str, object] = {
+        **row,
+        "name": name,
+        "lat": lat,
+        "lon": lon,
+        "verified": int(bool(data.get("verified", False))),
+        "tags": json.dumps(tags, ensure_ascii=False),
+        "updated_at": now(),
+        "search_norm": ascii_fold(" ".join((name, row["address"], row["province"], row["category"]))),
+    }
+    return record
 
 
 def upsert(
@@ -147,6 +148,7 @@ def upsert(
     cols = ",".join((*row.keys(), "external_id"))
     vals = ",".join("?" for _ in range(len(row) + 1))
     cur = db.execute(f"INSERT INTO places ({cols}) VALUES ({vals})", (*row.values(), external_id))
+    assert cur.lastrowid is not None
     return cur.lastrowid, True
 
 
@@ -182,7 +184,7 @@ def query(
     limit = max(1, min(500, int(limit)))
     offset = max(0, min(1_000_000, int(offset)))
     clauses = []
-    params = []
+    params: list[str | float] = []
     joins = ""
     if bbox:
         w, s, e, n = bbox
