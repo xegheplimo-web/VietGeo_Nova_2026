@@ -16,3 +16,7 @@ data/admin_provenance.json
 .idea/
 .DS_Store
 nul
+
+# Agent/tooling scratch
+.coverage
+.devin/
