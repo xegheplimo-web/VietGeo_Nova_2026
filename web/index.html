@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="vi"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="VietGeo Nova — bản đồ Việt Nam, địa điểm, dữ liệu mở, tìm kiếm theo vùng, API địa lý.">
+<title>VietGeo Nova — Khám phá Việt Nam</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@6.15.0/dist/maplibre-gl.css">
+<link rel="stylesheet" href="/style.css">
+<script type="module" src="/app.js"></script>
+</head><body>
+<div class="app">
+<aside class="sidebar" id="sidebar">
+  <div class="brand"><div class="brand-mark">VN<span>✦</span></div><div><div class="brand-name">VIETGEO <b>NOVA</b></div><div class="brand-sub">VIETNAM 2026 · LOCAL-FIRST</div></div></div>
+  <div class="section-search"><label class="eyebrow" for="search">KHÁM PHÁ ĐỊA ĐIỂM</label><div class="search-box"><span>⌕</span><input id="search" placeholder="Tên, địa chỉ, không dấu…" autocomplete="off"><button id="clear-search" title="Xóa tìm kiếm">×</button></div>
+  <div class="filters"><select id="province"><option value="">Tất cả tỉnh / thành</option></select><select id="category"><option value="">Mọi danh mục</option></select></div>
+  <div class="toolbar"><button id="nearby">◎ Quanh tôi</button><button id="admin-toggle">⌖ Hành chính</button><button id="bookmark-toggle">☆ Đã lưu</button></div></div>
+  <div class="panel-meta"><div><div class="mini-label">ĐIỂM TRONG CSDL</div><div class="metric" id="total-count">0</div></div><div class="right"><div class="mini-label">KẾT QUẢ HIỂN THỊ</div><div class="metric" id="visible-count">0</div></div></div>
+  <div class="section-title"><span>ĐỊA ĐIỂM</span><span class="result-note" id="result-note">Theo vùng bản đồ</span></div>
+  <div id="results" class="results"><div class="empty">Di chuyển bản đồ để khám phá, hoặc nhập dữ liệu OpenStreetMap.</div></div>
+  <footer class="sidebar-footer"><div id="dataset-status">Dữ liệu địa điểm: chỉ nguồn đã nhập</div><small>© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a> · <a href="https://openfreemap.org/" target="_blank" rel="noopener noreferrer">OpenFreeMap</a></small></footer>
+</aside>
+<main class="map-wrap"><div id="map" aria-label="Bản đồ tương tác Việt Nam"></div>
+  <div class="map-top"><button class="mobile-only" id="mobile-menu">☰</button><span class="glass-pill"><span class="dot"></span> VIETNAM · 34 TỈNH/THÀNH</span><div class="map-actions"><select id="base-style" aria-label="Kiểu bản đồ"><option value="liberty">Đường phố</option><option value="positron">Tối giản</option><option value="dark">Ban đêm</option><option value="bright">Sáng màu</option></select><button title="Về Việt Nam" id="reset-view">↗ Toàn quốc</button><button title="Vị trí của tôi" id="geo-locate">◎</button><button id="pitch" title="Nghiêng góc nhìn">3D</button></div></div>
+  <div class="map-bottom"><button class="coordinates" id="copy-coordinates" title="Sao chép tọa độ giữa bản đồ">VN 16.00° N · 106.0° E</button><div class="quick-tools"><button id="add-location">＋ Thêm địa điểm</button><button id="load-osm-area">⟳ Nạp OSM vùng</button><button id="import-file">⇧ Nhập dữ liệu</button><button id="export-data">⇩ Xuất dữ liệu</button></div></div>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <div class="map-error" id="map-error" hidden>Không tải được bản đồ nền. Hãy kiểm tra kết nối Internet đến OpenFreeMap và CDN MapLibre.</div>
+</main>
+</div>
+<div class="modal-backdrop" id="modal" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal-top"><div><div class="eyebrow">VIETGEO NOVA · PERSONAL DATA</div><h2 id="modal-title">Thêm địa điểm</h2></div><button id="close-modal" aria-label="Đóng">×</button></div>
+  <form id="place-form"><input type="hidden" id="place-id"><div class="form-row"><label>Tên địa điểm *<input required id="place-name" maxlength="250" placeholder="Ví dụ: Cửa hàng A"></label><label>Danh mục<input id="place-category" placeholder="shop / cafe / ..."></label></div>
+  <label>Địa chỉ<input id="place-address" placeholder="Số nhà, đường, xã, tỉnh"></label><label>Tỉnh / thành<select id="place-province"><option value="">Chưa xác định</option></select></label><div class="form-row"><label>Vĩ độ *<input id="place-lat" required type="number" step="any" min="-90" max="90"></label><label>Kinh độ *<input id="place-lon" required type="number" step="any" min="-180" max="180"></label></div>
+  <label>Link nguồn (tuỳ chọn)<input id="place-source-url" type="url" placeholder="https://..."></label><div class="form-help">Địa điểm tự thêm sẽ lưu trong SQLite trên máy, không gửi lên Google. Khi chọn “＋ Thêm”, nhấp lên bản đồ để lấy tọa độ.</div>
+  <label class="token-label">Bearer API Token (chỉ cần khi bạn bật VIETGEO_API_TOKEN)<input id="api-token" type="password" autocomplete="off" placeholder="Nhập token phiên làm việc"></label>
+  <div class="modal-buttons"><button type="button" id="delete-place" class="danger" hidden>Xóa</button><span></span><button type="button" id="cancel-modal">Hủy</button><button type="submit" class="primary">Lưu địa điểm</button></div>
+  </form>
+</section></div>
+<input id="file-input" type="file" accept=".json,.geojson,.csv,application/json,text/csv" hidden>
+</body></html>

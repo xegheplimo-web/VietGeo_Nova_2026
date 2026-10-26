@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+*.log
+backups/
+data/*.sqlite3*
+data/*.pbf*
+data/wards_3321.json
+data/admin_provenance.json
+*.zip

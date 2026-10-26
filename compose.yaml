@@ -1,0 +1,15 @@
+services:
+  vietgeo:
+    build: .
+    ports:
+      - "127.0.0.1:8765:8765"
+    environment:
+      VIETGEO_DB: /runtime/vietgeo.sqlite3
+      VIETGEO_CONTAINER: "1"
+      VIETGEO_AUTO_ADMIN_SYNC: "1"
+    volumes:
+      - ./data:/app/data
+      - vietgeo_runtime:/runtime
+    restart: unless-stopped
+volumes:
+  vietgeo_runtime:

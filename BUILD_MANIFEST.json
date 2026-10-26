@@ -1,0 +1,38 @@
+{
+  "name": "VietGeo Nova",
+  "version": "1.0.0",
+  "created_local_date": "2026-10-27",
+  "independent_of_existing_projects": true,
+  "offline_embedded_data": {
+    "province_city_units": 34,
+    "ward_units": 0,
+    "poi_records": 0
+  },
+  "note": "Wards downloaded first-run; POI downloaded on explicit OSM import; online basemap.",
+  "files": {
+    ".dockerignore": "66de5038fbcada8047a78ee4d06fcf0c48a75eae1e33dfbe442cf11cd42ee5d0",
+    ".gitignore": "96b384e4f8c4b539e34503cbaf8ef1c79f810513cdad3cebb279bd78438517c1",
+    "Dockerfile": "ba61296389eaef9a670cd412007db6159551dd5c451ee0583f0c1707092de940",
+    "LICENSE": "14dbec9b3a83b419ca4c1adae3f5d5a2b7cb4978ebac0f84e67c05a27620faf0",
+    "README.md": "5984ce3f741dbdac92615e2e86dfadc5c52251c52f8e6b3ebdbcb283305089e5",
+    "START_LINUX_MAC.sh": "48dd119bf992ffb78868462c3e8bc2d6ce3903885e08d0e1333fdd26b6a9fe9e",
+    "START_WINDOWS.bat": "2153a37de29b55a55f5aa576289a6b36ea4d713aacdaa0da6effcd09f67f81a3",
+    "UPDATE_DATA_WINDOWS.bat": "2dd12a1ff7f006e0d7411ed8d3767355e9bc2ad1a3ecfd77fe042cc8f12944a0",
+    "compose.yaml": "3fcf7208088d9080524169abd192699d138d618a818dbf9a9debdad6ec8edd5a",
+    "data/provinces_34.json": "137ba34f782461e9d7f1cc3cdecee440964690c5cec4137854068318297da223",
+    "docs/SOURCES_AND_LICENSES.md": "4769b5faa3f82e9bbdac05d68aa18582578899d40dde06ec33a27b92cb6f79f2",
+    "docs/VERIFICATION.md": "c68f56777db249353f56c3d7973a5112ccb8bd225c320c43a8bfeaec6575eb30",
+    "tests/test_vietgeo.py": "4fbd7af160c614da1318cedb011fb8657079ea297e1335b05c6b9a1bf276dd1e",
+    "tools/backup.py": "1d11018091b34a0e9592cc5cc558eb94b021ae3c9b1061cae9ec36a59a76c0a9",
+    "tools/download_osm.py": "0f06c46c6a7e472e1e5ed0583fc2dc02634667afbe397ce2366f17e7264ba662",
+    "tools/import_osm.py": "b7bbdf94f39f759fa65cf949ba24c4ccc8e9a6c6ed21d2f52938c03255a4a5e7",
+    "tools/sync_admin.py": "827d47edabdb204e400d138ab366efd58dc85368aa179cd89dda317de354c943",
+    "vietgeo/__init__.py": "e262fa0b4b2a578a87c4923f7843c3a8248a47443107601fb2e69e399a049e40",
+    "vietgeo/db.py": "16cd22d402c4f113f34c4ae1d951bf9337b764cad6511f7eef3eb41716b00dfe",
+    "vietgeo/osm.py": "876700293999df31917522b52a1d951a5f798c985097ca4a8844cc0ef0552b0d",
+    "vietgeo/server.py": "af9ed3e3b853da5d1f0ce6781b76946d779cb03dbec39e622e0b4e35a3354f1b",
+    "web/app.js": "4d09f83cdaba9b5ea2fd290df96d300568613d50701911833c7aab8770a2f59c",
+    "web/index.html": "cf2f423ed79d3026bcdb1063f9cda629b68c49eb6d873750da99319739881874",
+    "web/style.css": "21ffc49170b17d6917b633ed1947238bb25aa19a407c054516e165378eab3608"
+  }
+}
