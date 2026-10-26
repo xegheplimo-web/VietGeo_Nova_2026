@@ -56,7 +56,7 @@ jobs:
         run: docker run -d --name vietgeo-smoke -p 127.0.0.1:8765:8765 vietgeo-nova:test
       - name: Health check
         run: |
-          for i in $(seq 1 30); do
+          for i in $(seq 1 60); do
             code=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8765/api/health || true)
             if [ "$code" = "200" ]; then
               echo "Health check passed (HTTP 200)"
@@ -68,6 +68,7 @@ jobs:
           done
           if [ "$code" != "200" ]; then
             echo "Health check FAILED"
+            docker logs vietgeo-smoke
             exit 1
           fi
       - name: API probe

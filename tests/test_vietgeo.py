@@ -210,8 +210,14 @@ class HttpTests(unittest.TestCase):
                 }
             ]
         }
-        with patch("vietgeo.osm.urlopen", return_value=io.BytesIO(json.dumps(raw).encode())):
+        # Patch the server's OSM import path so no real network is reached.
+        # side_effect returns a fresh BytesIO per call (BytesIO is closed by `with`).
+        def _fake_urlopen(_request, timeout=38):
+            return io.BytesIO(json.dumps(raw).encode("utf-8"))
+
+        with patch.object(osm, "urlopen", side_effect=_fake_urlopen) as mocked:
             st, x = self.call("/api/osm/area", "POST", {"bbox": [105.7, 21, 105.9, 21.3]})
+        mocked.assert_called_once()
         osm._last_requested = old
         self.assertEqual(st, 200)
         self.assertEqual(x["imported"], 1)
