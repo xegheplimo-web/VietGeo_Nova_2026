@@ -45,6 +45,24 @@ jobs:
           node --version
           node --check web/app.js
 
+  typecheck:
+    name: Typecheck (Python ${{ matrix.python-version }})
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+      - name: Run mypy
+        run: uvx --with mypy mypy vietgeo tools
+
   docker:
     name: Docker build & smoke
     runs-on: ubuntu-latest

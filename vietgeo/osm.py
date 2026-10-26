@@ -14,7 +14,7 @@ from urllib.request import Request, urlopen
 from . import db
 
 # Keep categories stable for long-term indexing and low-cardinality filters.
-MAP = {
+MAP: dict[str, dict[str, str] | str] = {
     "amenity": {
         "restaurant": "Ẩm thực",
         "cafe": "Ẩm thực",
