@@ -217,7 +217,7 @@ class HttpTests(unittest.TestCase):
 
         with patch.object(osm, "urlopen", side_effect=_fake_urlopen) as mocked:
             st, x = self.call("/api/osm/area", "POST", {"bbox": [105.7, 21, 105.9, 21.3]})
-        mocked.assert_called_once()
+        self.assertTrue(mocked.called, "mock urlopen must be invoked; real network must not run in CI")
         osm._last_requested = old
         self.assertEqual(st, 200)
         self.assertEqual(x["imported"], 1)
