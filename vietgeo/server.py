@@ -21,12 +21,36 @@ from . import db as storage
 MAX_BYTES = 16 * 1024 * 1024
 WEB = storage.ROOT / "web"
 
+CSP = "; ".join(
+    (
+        "default-src 'self'",
+        "script-src 'self' https://unpkg.com",
+        "style-src 'self' https://unpkg.com 'unsafe-inline'",
+        "img-src 'self' data: blob: https://tiles.openfreemap.org https://assets.openfreemap.com",
+        "font-src 'self' data: https://tiles.openfreemap.org https://assets.openfreemap.com https://api.mapbox.com",
+        "connect-src 'self' "
+        "https://unpkg.com "
+        "https://tiles.openfreemap.org "
+        "https://assets.openfreemap.com "
+        "https://overpass-api.de",
+        "worker-src 'self' blob: https://unpkg.com",
+        "object-src 'none'",
+        "base-uri 'none'",
+        "frame-ancestors 'none'",
+        "form-action 'self'",
+    )
+)
+
 
 class Handler(SimpleHTTPRequestHandler):
     server_version = "VietGeoNova/" + __version__
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(WEB), **kwargs)
+
+    def end_headers(self):
+        self.send_header("Content-Security-Policy", CSP)
+        super().end_headers()
 
     def log_message(self, format, *args):
         super().log_message(format, *args)
@@ -112,6 +136,10 @@ class Handler(SimpleHTTPRequestHandler):
         )
 
     def _host_allowed(self):
+        # Docker publishes the port under arbitrary Host values (host IP, LAN);
+        # VIETGEO_CONTAINER=1 is already required by main() to bind 0.0.0.0.
+        if os.getenv("VIETGEO_CONTAINER") == "1":
+            return True
         host = self.headers.get("Host", "")
         try:
             hostname = urlsplit("http://" + host).hostname

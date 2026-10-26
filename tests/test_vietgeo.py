@@ -149,6 +149,51 @@ class HttpTests(unittest.TestCase):
         st, provinces = self.call("/api/provinces")
         self.assertEqual(len(provinces["items"]), 34)
 
+    def _headers(self, path):
+        with urlopen(Request(self.base + path), timeout=5) as res:
+            return res.status, res.headers
+
+    def test_csp_on_html(self):
+        st, headers = self._headers("/")
+        self.assertEqual(st, 200)
+        csp = headers.get("Content-Security-Policy", "")
+        self.assertTrue(csp)
+        for directive in (
+            "default-src 'self'",
+            "script-src 'self' https://unpkg.com",
+            "style-src 'self' https://unpkg.com 'unsafe-inline'",
+            "img-src 'self' data: blob:",
+            "connect-src 'self'",
+            "worker-src 'self' blob: https://unpkg.com",
+        ):
+            self.assertIn(directive, csp)
+        self.assertIn("https://tiles.openfreemap.org", csp)
+        self.assertIn("https://overpass-api.de", csp)
+
+    def test_csp_on_api_health(self):
+        st, headers = self._headers("/api/health")
+        self.assertEqual(st, 200)
+        self.assertTrue(headers.get("Content-Security-Policy"))
+
+    def test_host_loopback_allowed(self):
+        st, _x = self.call("/api/health")
+        self.assertEqual(st, 200)
+
+    def test_host_foreign_blocked(self):
+        with patch.dict(os.environ):
+            os.environ.pop("VIETGEO_CONTAINER", None)
+            req = Request(self.base + "/api/health", headers={"Host": "10.0.0.5:9"})
+            with self.assertRaises(HTTPError) as ctx:
+                urlopen(req, timeout=5)
+            self.assertEqual(ctx.exception.code, 403)
+            ctx.exception.close()
+
+    def test_host_foreign_allowed_in_container(self):
+        with patch.dict(os.environ, {"VIETGEO_CONTAINER": "1"}):
+            req = Request(self.base + "/api/health", headers={"Host": "10.0.0.5:9"})
+            with urlopen(req, timeout=5) as res:
+                self.assertEqual(res.status, 200)
+
     def test_crud_and_search(self):
         payload = {
             "name": "Trường học Việt",
